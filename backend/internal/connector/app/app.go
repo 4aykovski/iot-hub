@@ -17,7 +17,7 @@ type App struct {
 	provider *Provider
 }
 
-func New(done chan struct{}) *App {
+func NewConnectorApp(done chan struct{}) *App {
 
 	a := &App{}
 

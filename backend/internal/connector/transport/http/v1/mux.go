@@ -135,6 +135,7 @@ func TryToConnect(done chan struct{}) http.HandlerFunc {
 		fmt.Fprintf(w, res)
 
 		done <- struct{}{}
+		close(done)
 	}
 }
 

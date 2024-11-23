@@ -1,6 +1,6 @@
 import DeviceList from "@/components/DeviceList";
 
-export default function Home() {
+export default function Devices() {
   const devices = [
     { name: "Device 1", data: "Data 1", ID: "1" },
     { name: "Device 2", data: "Data 2", ID: "2" },
@@ -12,8 +12,8 @@ export default function Home() {
 
   return (
     <div>
-      <main>
-        <DeviceList devices={devices} type="card" />
+      <main className="flex justify-center items-center">
+        <DeviceList devices={devices} type="table" />
       </main>
     </div>
   );

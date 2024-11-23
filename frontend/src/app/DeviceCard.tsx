@@ -1,3 +1,4 @@
+import TemperatuteChart from "@/components/TemperatureChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
@@ -7,7 +8,7 @@ interface DeviceCardProps {
 
 const DeviceCard: React.FC<DeviceCardProps> = ({ device }) => {
   return (
-    <Card className="bg-primary-foreground w-[400px] h-[300px]  mb-10">
+    <Card className="bg-primary-foreground w-[400px] h-auto  mb-10">
       <CardHeader>
         <CardTitle>
           <Link href={`/devices/${device.ID}`} legacyBehavior passHref>
@@ -16,7 +17,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({ device }) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p>{device.data}</p>
+        <TemperatuteChart id={device.ID} />
       </CardContent>
     </Card>
   );

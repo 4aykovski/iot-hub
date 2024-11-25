@@ -28,9 +28,9 @@ func scanNetwork(subnet string, port string, path string) {
 
 			fmt.Println(url)
 			resp, err := client.Get(url)
+			fmt.Println(resp)
 			if err == nil {
 				defer resp.Body.Close()
-				fmt.Println(resp.StatusCode)
 				if resp.StatusCode == 200 {
 					results <- ip
 				}
@@ -60,6 +60,14 @@ func main() {
 	// Примеры использования
 	// scanNetwork("192.168.182", "19050", "/connect") // Типичная домашняя сеть
 
+	// resp, err := http.Post("http://192.168.182.187:19050/connect", "application/json", nil)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	//
+	// fmt.Println(resp)
+
 	body := SomeBody{
 		SSID:     "iPhone",
 		Password: "Lionart724",
@@ -71,6 +79,7 @@ func main() {
 		return
 	}
 
+	fmt.Println(string(str))
 	res, err := http.Post(
 		"http://192.168.182.187:19050/connect",
 		"application/json",

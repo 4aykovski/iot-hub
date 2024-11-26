@@ -11,7 +11,7 @@ func main() {
 	http.HandleFunc("/data", dataHandler())
 	http.HandleFunc("/connect", connectHandler())
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":19050", nil)
 	if err != nil {
 		panic(err)
 	}

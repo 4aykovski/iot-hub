@@ -71,6 +71,7 @@ func main() {
 		return
 	}
 
+	fmt.Println(string(str))
 	res, err := http.Post(
 		"http://192.168.182.187:19050/connect",
 		"application/json",

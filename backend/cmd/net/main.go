@@ -1,20 +1,28 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
 
-func scanNetwork(subnet string, port string, path string) {
+const (
+	sensor = "temp-sensor"
+)
+
+type Response struct {
+	Name string `json:"sensor_name"`
+}
+
+func scanNetwork(results chan string, subnet string, port string, path string) {
 	var wg sync.WaitGroup
-	results := make(chan string, 255)
 
 	// Параллельное сканирование
-	for i := 1; i <= 254; i++ {
+	for i := 0; i <= 254; i++ {
 		wg.Add(1)
 		go func(host int) {
 			defer wg.Done()
@@ -23,19 +31,23 @@ func scanNetwork(subnet string, port string, path string) {
 			url := fmt.Sprintf("http://%s:%s%s", ip, port, path)
 
 			client := http.Client{
-				Timeout: 2 * time.Second, // Короткий таймаут
+				Timeout: 3 * time.Second, // Короткий таймаут
 			}
 
-			fmt.Println(url)
 			resp, err := client.Get(url)
 			if err == nil {
 				defer resp.Body.Close()
-				fmt.Println(resp.StatusCode)
-				if resp.StatusCode == 200 {
+
+				res := Response{}
+				err := json.NewDecoder(resp.Body).Decode(&res)
+				if err != nil {
+					return
+				}
+
+				if resp.StatusCode == 200 && res.Name == sensor {
 					results <- ip
 				}
 			}
-			fmt.Println(err)
 		}(i)
 	}
 
@@ -44,43 +56,39 @@ func scanNetwork(subnet string, port string, path string) {
 		wg.Wait()
 		close(results)
 	}()
-
-	// Сбор результатов
-	for result := range results {
-		fmt.Printf("Found device at: %s\n", result)
-	}
-}
-
-type SomeBody struct {
-	SSID     string `json:"SSID"`
-	Password string `json:"Password"`
 }
 
 func main() {
-	// Примеры использования
-	// scanNetwork("192.168.182", "19050", "/connect") // Типичная домашняя сеть
+	subnet := flag.String("subnet", "127.0.0", "Subnet to scan")
+	port := flag.String("port", "8080", "Port to scan")
+	path := flag.String("path", "/data", "Path to scan")
+	output := flag.String("output", "/home/root/apps/iot-hub/backend/.env", "Output file")
+	flag.Parse()
 
-	body := SomeBody{
-		SSID:     "iPhone",
-		Password: "Lionart724",
+	fmt.Println("network scan started on", *subnet, *port, *path)
+
+	results := make(chan string, 255)
+	scanNetwork(results, *subnet, *port, *path) // Типичная домашняя сеть
+
+	foundNets := "DEVICES_NETWORKS='"
+
+	for result := range results {
+		fmt.Printf("Found device at: %s\n", result)
+		foundNets += result + " "
 	}
 
-	str, err := json.Marshal(&body)
+	foundNets = foundNets + "'\n"
+
+	outputFile, err := os.Create(*output)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
+	defer outputFile.Close()
 
-	fmt.Println(string(str))
-	res, err := http.Post(
-		"http://192.168.182.187:19050/connect",
-		"application/json",
-		bytes.NewReader(str),
-	)
+	_, err = outputFile.WriteString(foundNets)
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(err)
 	}
 
-	fmt.Println(res)
+	fmt.Println("network scan done")
 }

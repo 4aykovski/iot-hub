@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"net/http"
 )
@@ -11,7 +12,9 @@ func main() {
 	http.HandleFunc("/data", dataHandler())
 	http.HandleFunc("/connect", connectHandler())
 
-	err := http.ListenAndServe(":19050", nil)
+	fmt.Println("Listening on port 19050")
+
+	err := http.ListenAndServe("0.0.0.0:19050", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -25,6 +28,8 @@ type DataResponse struct {
 
 func dataHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		fmt.Println("Received request")
 
 		var resp DataResponse
 

@@ -26,12 +26,15 @@ func main() {
 
 	test := make(chan os.Signal, 1)
 	signal.Notify(test, syscall.SIGINT, syscall.SIGTERM)
-	select {
-	case <-test:
-		done <- struct{}{}
-	case <-done:
-		if err := connector.GracefullStop(context.Background()); err != nil {
-			panic(err)
+	for {
+		select {
+		case <-test:
+			done <- struct{}{}
+		case <-done:
+			if err := connector.GracefullStop(context.Background()); err != nil {
+				panic(err)
+			}
+			return
 		}
 	}
 }

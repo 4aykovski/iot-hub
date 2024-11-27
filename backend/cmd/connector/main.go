@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	done := make(chan struct{})
+	done := make(chan struct{}, 1)
 
 	connector := connectorApp.NewConnectorApp(done)
 	go func() {

@@ -14,11 +14,10 @@ func New() *chi.Mux {
 		r.Get("/devices", deviceHandler.GetDevices())
 
 		r.Route("/devices/{id}", func(r chi.Router) {
-			r.Get("", deviceHandler.GetDevice())
-			r.Put("", deviceHandler.UpdateDevice())
+			r.Get("/", deviceHandler.GetDevice())
+			r.Put("/", deviceHandler.UpdateDevice())
 			r.Get("/data", deviceHandler.GetDeviceData())
 		})
-
 	})
 
 	return chi.NewMux()

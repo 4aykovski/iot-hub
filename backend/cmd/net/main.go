@@ -62,7 +62,11 @@ func main() {
 	subnet := flag.String("subnet", "127.0.0", "Subnet to scan")
 	port := flag.String("port", "8080", "Port to scan")
 	path := flag.String("path", "/data", "Path to scan")
-	output := flag.String("output", "/home/root/apps/iot-hub/backend/.env", "Output file")
+	output := flag.String(
+		"output",
+		"/home/root/apps/iot-hub/backend/configs/.env.device",
+		"Output file",
+	)
 	flag.Parse()
 
 	fmt.Println("network scan started on", *subnet, *port, *path)

@@ -95,7 +95,7 @@ func TryToConnect(done chan struct{}) http.HandlerFunc {
 			r.Context(),
 			app,
 			"-c",
-			"nmcli dev wifi connect "+ssid,
+			"sudo nmcli dev wifi connect "+ssid,
 		)
 
 		if len(password) > 0 {

@@ -1,5 +1,3 @@
-!#/bin/bash
-
 BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
 FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
 

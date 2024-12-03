@@ -77,7 +77,7 @@ func main() {
 	foundNets := "DEVICES_NETWORKS='"
 
 	for result := range results {
-		fmt.Printf("Found device at: %s\n", result)
+		fmt.Printf("Found device at: %s:19050\n", result)
 		foundNets += result + " "
 	}
 

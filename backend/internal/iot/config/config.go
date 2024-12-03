@@ -33,6 +33,11 @@ func Load() *Config {
 		panic(err.Error())
 	}
 
+	err = godotenv.Load("./configs/.env.device")
+	if err != nil {
+		panic(err.Error())
+	}
+
 	err = cleanenv.ReadEnv(&cfg)
 	if err != nil {
 		panic(err.Error())

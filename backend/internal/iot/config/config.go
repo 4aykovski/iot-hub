@@ -1,12 +1,15 @@
 package config
 
 import (
+	"github.com/4aykovski/iot-hub/backend/pkg/database/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Http
+
+	Postgres postgres.Config
 }
 
 type Http struct {

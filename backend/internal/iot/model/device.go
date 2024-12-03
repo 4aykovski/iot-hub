@@ -1,7 +1,7 @@
 package model
 
 type Device struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Data []Data `json:"data"`
+	ID    string  `json:"id"`
+	Name  string  `json:"name"`
+	Limit float64 `json:"limit"`
 }

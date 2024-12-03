@@ -5,19 +5,24 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func New() *chi.Mux {
-	deviceHandler := handlers.NewDevice()
+func New(
+	deviceService handlers.DeviceService,
+	dataService handlers.DataService,
+) *chi.Mux {
+	deviceHandler := handlers.NewDevice(deviceService)
+	dataHandler := handlers.NewData(dataService)
 
 	mux := chi.NewMux()
 
 	mux.Route("/api/v1", func(r chi.Router) {
-		r.Get("/devices", deviceHandler.GetDevices())
+		r.Get("/devices", deviceHandler.GetDevice())
 
 		r.Route("/devices/{id}", func(r chi.Router) {
 			r.Get("/", deviceHandler.GetDevice())
 			r.Put("/", deviceHandler.UpdateDevice())
-			r.Get("/data", deviceHandler.GetDeviceData())
 		})
+
+		r.Get("/data", dataHandler.GetDeviceData())
 	})
 
 	return chi.NewMux()

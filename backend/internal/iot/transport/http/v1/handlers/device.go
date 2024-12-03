@@ -1,16 +1,26 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/4aykovski/iot-hub/backend/internal/iot/model"
 )
 
-type DeviceHandler struct {
+type DeviceService interface {
+	GetDevices(ctx context.Context) ([]model.Device, error)
+	GetDevice(ctx context.Context, id string) (model.Device, error)
+	UpdateDevice(ctx context.Context, device model.Device) error
 }
 
-func NewDevice() *DeviceHandler {
-	return &DeviceHandler{}
+type DeviceHandler struct {
+	deviceService DeviceService
+}
+
+func NewDevice(deviceService DeviceService) *DeviceHandler {
+	return &DeviceHandler{
+		deviceService: deviceService,
+	}
 }
 
 type GetDevicesResponse struct {
@@ -34,16 +44,6 @@ func (h *DeviceHandler) GetDevice() http.HandlerFunc {
 }
 
 func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
-type GetDeviceData struct {
-	Data []model.Data `json:"data"`
-}
-
-func (h *DeviceHandler) GetDeviceData() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}

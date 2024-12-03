@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/4aykovski/iot-hub/backend/pkg/database/postgres"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
@@ -10,6 +12,12 @@ type Config struct {
 	Http
 
 	Postgres postgres.Config
+	Collector
+}
+
+type Collector struct {
+	Interval time.Duration `env:"COLLECTOR_INTERVAL" env-default:"5s"`
+	URLs     string        `env:"DEVICES_NETWORK"    env-default:"host.docker.internal:19050"`
 }
 
 type Http struct {

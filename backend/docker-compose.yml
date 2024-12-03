@@ -1,0 +1,44 @@
+version: "3.8"
+
+name: iot
+
+services:
+  backend:
+    build: .
+    env_file:
+      - ./configs/.env.iot
+    ports:
+      - 8080:8080
+    depends_on:
+      migrator:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  migrator:
+    build:
+      context: .
+      dockerfile: ./migrations/Dockerfile
+    env_file:
+      - ./configs/.env.iot
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    restart: always
+    image: postgres:latest
+    env_file:
+      - ./configs/.env.iot
+    ports:
+      - 5440:${POSTGRES_PORT}
+    environment:
+      PGUSER: ${POSTGRES_USER}
+      PGDATABASE: ${POSTGRES_DB}
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 5

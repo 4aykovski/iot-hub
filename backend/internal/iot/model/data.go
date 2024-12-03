@@ -3,9 +3,8 @@ package model
 import "time"
 
 type Data struct {
-	ID          string
-	Timestamp   time.Time
-	Temperature float64
-	Humidity    float64
-	DeviceID    string
+	ID        int
+	Timestamp time.Time
+	Value     float64
+	DeviceID  string
 }

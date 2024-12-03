@@ -1,0 +1,13 @@
+version: "3"
+
+tasks:
+  goose-up:
+    desc: "run goose up"
+    dotenv: ["./configs/.env.iot"]
+    cmds:
+      - goose -dir ./migrations postgres "host=$POSTGRES_HOST user=$POSTGRES_USER password=$POSTGRES_PASSWORD dbname=$POSTGRES_DB port=$POSTGRES_PORT sslmode=$POSTGRES_SSL" up
+  goose-down:
+    desc: "run goose down"
+    dotenv: ["./configs/.env.iot"]
+    cmds:
+      - goose -dir ./migrations postgres "host=$POSTGRES_HOST user=$POSTGRES_USER password=$POSTGRES_PASSWORD dbname=$POSTGRES_DB port=$POSTGRES_PORT sslmode=$POSTGRES_SSL" down

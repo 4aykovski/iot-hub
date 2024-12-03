@@ -6,12 +6,9 @@ import (
 )
 
 func New(
-	deviceService handlers.DeviceService,
-	dataService handlers.DataService,
+	deviceHandler *handlers.DeviceHandler,
+	dataHandler *handlers.Data,
 ) *chi.Mux {
-	deviceHandler := handlers.NewDevice(deviceService)
-	dataHandler := handlers.NewData(dataService)
-
 	mux := chi.NewMux()
 
 	mux.Route("/api/v1", func(r chi.Router) {

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -18,7 +20,14 @@ type Response struct {
 	Name string `json:"sensor_name"`
 }
 
-func scanNetwork(results chan string, subnet string, port string, path string) {
+func scanNetwork(
+	results chan string,
+	subnet string,
+	port string,
+	path string,
+	outWg *sync.WaitGroup,
+) {
+	defer outWg.Done()
 	var wg sync.WaitGroup
 
 	// Параллельное сканирование
@@ -52,16 +61,18 @@ func scanNetwork(results chan string, subnet string, port string, path string) {
 	}
 
 	// Закрытие канала после завершения всех горутин
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
+	wg.Wait()
 }
 
 func main() {
-	subnet := flag.String("subnet", "127.0.0", "Subnet to scan")
+	subnet := flag.String("subnet", "127.0.0.0", "Subnet to scan")
 	port := flag.String("port", "8080", "Port to scan")
 	path := flag.String("path", "/data", "Path to scan")
+	pathToSubnetFile := flag.String(
+		"subnetFile",
+		"",
+		"Path to subnet file",
+	)
 	output := flag.String(
 		"output",
 		"/home/root/apps/iot-hub/backend/configs/.env.device",
@@ -69,16 +80,69 @@ func main() {
 	)
 	flag.Parse()
 
-	fmt.Println("network scan started on", *subnet, *port, *path)
+	if *pathToSubnetFile != "" {
+		file, err := os.Open(*pathToSubnetFile)
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
 
-	results := make(chan string, 255)
-	scanNetwork(results, *subnet, *port, *path) // Типичная домашняя сеть
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			*subnet = scanner.Text()
+		}
+	}
+
+	nets := strings.Split(*subnet, " ")
+	subnets := make([]string, 0, len(nets))
+
+	for _, net := range nets {
+		index := strings.LastIndex(net, ".")
+
+		if index != -1 {
+			net = net[:index]
+		}
+
+		subnets = append(subnets, net)
+	}
+
+	fmt.Println("network scan started on", *port, *path)
 
 	foundNets := "DEVICES_NETWORKS='"
+	foundNetsMap := make(map[string]struct{})
+	for i := 0; i < 3; i++ {
+		results := make(chan string, 255)
+		wg := sync.WaitGroup{}
 
-	for result := range results {
-		fmt.Printf("Found device at: %s:19050\n", result)
-		foundNets += result + " "
+		for _, subnet := range subnets {
+			wg.Add(1)
+			fmt.Println("Scanning subnet", subnet)
+			go scanNetwork(results, subnet, *port, *path, &wg)
+		}
+
+		go func() {
+			wg.Wait()
+			close(results)
+		}()
+
+		for result := range results {
+			if _, ok := foundNetsMap[result]; ok {
+				continue
+			}
+
+			fmt.Printf("Found device at: %s:19050\n", result)
+			foundNets += result + " "
+			foundNetsMap[result] = struct{}{}
+		}
+
+		fmt.Printf("end %d try\n", i)
+		fmt.Println("Sleeping for 2 seconds...")
+		time.Sleep(2 * time.Second)
+	}
+
+	if foundNets == "DEVICES_NETWORKS='" {
+		fmt.Println("No devices found")
+		return
 	}
 
 	foundNets = foundNets + "'\n"

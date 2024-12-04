@@ -110,6 +110,7 @@ func main() {
 
 	foundNets := "DEVICES_NETWORKS='"
 	foundNetsMap := make(map[string]struct{})
+netloop:
 	for i := 0; i < 3; i++ {
 		results := make(chan string, 255)
 		wg := sync.WaitGroup{}
@@ -133,6 +134,7 @@ func main() {
 			fmt.Printf("Found device at: %s:19050\n", result)
 			foundNets += result + " "
 			foundNetsMap[result] = struct{}{}
+			break netloop
 		}
 
 		fmt.Printf("end %d try\n", i)

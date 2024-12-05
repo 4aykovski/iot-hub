@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-# BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
-# FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
+BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
+FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
 
-BACKEND_SERVER_PATH=~/code/iot-hub/backend
-FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
+# BACKEND_SERVER_PATH=~/code/iot-hub/backend
+# FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
 
 
 export PATH=$PATH:/usr/local/go/bin

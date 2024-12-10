@@ -46,7 +46,26 @@ func (de *Device) GetDevice(ctx context.Context, id string) (model.Device, error
 }
 
 func (de *Device) UpdateDevice(ctx context.Context, device model.Device) error {
-	err := de.deviceRepo.UpdateDevice(ctx, device)
+	oldDevice, err := de.deviceRepo.GetDevice(ctx, device.ID)
+	if err != nil {
+		return fmt.Errorf("device.GetDevice: %w", err)
+	}
+
+	if device.Name == "" {
+		device.Name = oldDevice.Name
+	}
+
+	if device.Type == "" {
+		device.Type = oldDevice.Type
+	}
+
+	if device.Limit == 0 {
+		device.Limit = oldDevice.Limit
+	}
+
+	fmt.Println(device)
+
+	err = de.deviceRepo.UpdateDevice(ctx, device)
 	if err != nil {
 		return fmt.Errorf("device.UpdateDevice: %w", err)
 	}

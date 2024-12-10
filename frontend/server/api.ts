@@ -1,5 +1,5 @@
 export const getDevices = async () => {
-  const response = await fetch("/api/v1/devices");
+  const response = await fetch("http://localhost:8080/api/v1/devices");
 
   if (!response.ok) {
     throw new Error(response.statusText);
@@ -9,7 +9,7 @@ export const getDevices = async () => {
 };
 
 export const getDevice = async (id: string) => {
-  const response = await fetch(`/api/v1/devices/${id}`);
+  const response = await fetch(`http://localhost:8080/api/v1/devices/${id}`);
 
   if (!response.ok) {
     throw new Error(response.statusText);
@@ -19,7 +19,8 @@ export const getDevice = async (id: string) => {
 };
 
 export const updateDevice = async (id: string, data: any) => {
-  const response = await fetch(`/api/v1/devices/${id}`, {
+  console.log(data);
+  const response = await fetch(`http://localhost:8080/api/v1/devices/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -34,8 +35,12 @@ export const updateDevice = async (id: string, data: any) => {
   return response.json();
 };
 
-export const getData = async (id: string) => {
-  const response = await fetch(`/api/v1/devices/${id}/data`);
+export const getData = async (id: string, interval: string) => {
+  const response = await fetch(
+    `http://localhost:8080/api/v1/devices/${id}/data?interval=${interval}`,
+  );
+
+  console.log(response);
 
   if (!response.ok) {
     throw new Error(response.statusText);

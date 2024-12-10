@@ -7,17 +7,19 @@ interface DeviceCardProps {
 }
 
 const DeviceCard: React.FC<DeviceCardProps> = ({ device }) => {
+  console.log(device);
   return (
     <Card className="bg-primary-foreground w-[400px] h-auto  mb-10">
-      <CardHeader>
+      <CardHeader className="flex justify-between flex-row">
         <CardTitle>
           <Link href={`/devices/${device.ID}`} legacyBehavior passHref>
             {device.name}
           </Link>
         </CardTitle>
+        <div>ID: {device.ID}</div>
       </CardHeader>
       <CardContent>
-        <TemperatuteChart id={device.ID} />
+        <TemperatuteChart id={device.ID} limit={device.limit} />
       </CardContent>
     </Card>
   );

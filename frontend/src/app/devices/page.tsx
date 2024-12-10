@@ -8,12 +8,12 @@ export default function Devices() {
 
   React.useEffect(() => {
     const fetchDevices = async () => {
-      const response = await fetch("/api/v1/devices");
+      const response = await fetch("/api/devices");
       const data = await response.json();
       setDevices(data);
     };
     fetchDevices();
-  });
+  }, []);
 
   return (
     <div>

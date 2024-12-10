@@ -102,7 +102,6 @@ func (h *DeviceHandler) GetDevice() http.HandlerFunc {
 
 type UpdateDeviceRequest struct {
 	Name  string  `json:"name"`
-	Type  string  `json:"type"`
 	Limit float64 `json:"limit"`
 }
 
@@ -111,10 +110,11 @@ func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
 		id := chi.URLParam(r, "id")
 
 		var req UpdateDeviceRequest
-		if err := render.DecodeJSON(r.Body, req); err != nil {
+		if err := render.DecodeJSON(r.Body, &req); err != nil {
 			slog.Info(
 				"invalid request",
 				slog.String("id", id),
+				slog.String("error", err.Error()),
 			)
 
 			render.Status(r, http.StatusBadRequest)
@@ -125,7 +125,6 @@ func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
 		device := model.Device{
 			ID:    id,
 			Name:  req.Name,
-			Type:  req.Type,
 			Limit: req.Limit,
 		}
 
@@ -140,6 +139,11 @@ func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
 			render.JSON(w, r, response.InternalError())
 			return
 		}
+
+		slog.Info(
+			"device updated",
+			slog.String("id", id),
+		)
 
 		render.JSON(w, r, response.OK())
 	}

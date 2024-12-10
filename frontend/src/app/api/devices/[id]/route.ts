@@ -1,18 +1,31 @@
 import { NextResponse } from "next/server";
 import { getDevice, updateDevice } from "../../../../../server/api";
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const p = await params;
+    const id = p.id;
+    console.log(id);
     if (!id) {
       return NextResponse.error();
     }
 
     const res = await getDevice(id);
+    console.log(res);
 
-    return NextResponse.json(res);
+    const device: Device = {
+      ID: res.device.id,
+      name: res.device.name,
+      type: res.device.type,
+      limit: res.device.limit,
+    };
+
+    return NextResponse.json(device);
   } catch (error: any) {
+    console.error("123");
     console.error(error);
     return NextResponse.error();
   }

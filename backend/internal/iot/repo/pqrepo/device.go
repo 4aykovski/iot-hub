@@ -68,6 +68,7 @@ func (d *Device) GetDevices(ctx context.Context) ([]model.Device, error) {
 	conn := d.DB.GetConnection(ctx)
 
 	stmt, args, err := squirrel.Select("*").From("devices").
+		OrderBy("id").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
@@ -77,6 +78,7 @@ func (d *Device) GetDevices(ctx context.Context) ([]model.Device, error) {
 	var devices []model.Device
 	rows, err := conn.Query(ctx, stmt, args...)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return []model.Device{}, repoerrs.ErrNoDevice
 		}

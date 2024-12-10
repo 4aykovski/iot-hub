@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/4aykovski/iot-hub/backend/internal/iot/model"
@@ -14,7 +15,7 @@ import (
 )
 
 type DataService interface {
-	GetDeviceData(ctx context.Context, id string) ([]model.Data, error)
+	GetDeviceData(ctx context.Context, id string, interval int) ([]model.Data, error)
 	GetDataFromPeriod(ctx context.Context, dto service.GetDataForPeriodDTO) ([]model.Data, error)
 }
 
@@ -35,7 +36,37 @@ type GetDeviceDataResponse struct {
 
 func (h *Data) GetDeviceData() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
+		id := chi.URLParam(r, "id")
+		intervalString := r.URL.Query().Get("interval")
+		interval, err := strconv.Atoi(intervalString)
+		if err != nil {
+			slog.Info(
+				"invalid interval",
+				slog.String("interval", intervalString),
+			)
+
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.BadRequestError("invalid interval"))
+			return
+		}
+
+		data, err := h.dataService.GetDeviceData(r.Context(), id, interval)
+		if err != nil {
+			slog.Error(
+				"data.GetDeviceData",
+				slog.String("error", err.Error()),
+				slog.String("id", id),
+			)
+
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, response.InternalError())
+			return
+		}
+
+		render.JSON(w, r, GetDeviceDataResponse{
+			Response: response.OK(),
+			Data:     data,
+		})
 	}
 }
 

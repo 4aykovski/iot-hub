@@ -12,15 +12,14 @@ func New(
 	mux := chi.NewMux()
 
 	mux.Route("/api/v1", func(r chi.Router) {
-		r.Get("/devices", deviceHandler.GetDevice())
+		r.Get("/devices", deviceHandler.GetDevices())
 
 		r.Route("/devices/{id}", func(r chi.Router) {
 			r.Get("/", deviceHandler.GetDevice())
 			r.Put("/", deviceHandler.UpdateDevice())
+			r.Get("/data", dataHandler.GetDeviceData())
 		})
-
-		r.Get("/data", dataHandler.GetDeviceData())
 	})
 
-	return chi.NewMux()
+	return mux
 }

@@ -24,7 +24,10 @@ func NewData(db postgres.DB) *Data {
 func (d *Data) GetDeviceData(ctx context.Context, id string) ([]model.Data, error) {
 	conn := d.DB.GetConnection(ctx)
 
-	stmt, args, err := squirrel.Select("*").From("data").Where("device_id = ?", id).
+	stmt, args, err := squirrel.Select("id, device_id, value, timestamp").
+		From("data").
+		Where("device_id = ?", id).
+		OrderBy("timestamp ").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
@@ -45,9 +48,9 @@ func (d *Data) GetDeviceData(ctx context.Context, id string) ([]model.Data, erro
 		var datum model.Data
 		err = rows.Scan(
 			&datum.ID,
-			&datum.Timestamp,
-			&datum.Value,
 			&datum.DeviceID,
+			&datum.Value,
+			&datum.Timestamp,
 		)
 		if err != nil {
 			return []model.Data{}, fmt.Errorf("data.GetDeviceData: %w", err)
@@ -70,10 +73,11 @@ func (d *Data) GetDeviceDataForPeriod(
 ) ([]model.Data, error) {
 	conn := d.DB.GetConnection(ctx)
 
-	stmt, args, err := squirrel.Select("*").From("data").
+	stmt, args, err := squirrel.Select("id, device_id, value, timestamp").From("data").
 		Where("device_id = ?", id).
 		Where("timestamp >= ?", start).
 		Where("timestamp <= ?", end).
+		OrderBy("timestamp ").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
@@ -94,9 +98,9 @@ func (d *Data) GetDeviceDataForPeriod(
 		var datum model.Data
 		err = rows.Scan(
 			&datum.ID,
-			&datum.Timestamp,
-			&datum.Value,
 			&datum.DeviceID,
+			&datum.Value,
+			&datum.Timestamp,
 		)
 		if err != nil {
 			return []model.Data{}, fmt.Errorf("data.GetDeviceDataForPeriod: %w", err)

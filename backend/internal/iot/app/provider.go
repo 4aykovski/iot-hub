@@ -30,7 +30,7 @@ type DeviceRepository interface {
 }
 
 type DataService interface {
-	GetDeviceData(ctx context.Context, id string) ([]model.Data, error)
+	GetDeviceData(ctx context.Context, id string, interval int) ([]model.Data, error)
 	GetDataFromPeriod(ctx context.Context, dto service.GetDataForPeriodDTO) ([]model.Data, error)
 	SaveData(ctx context.Context, data model.Data) error
 }

@@ -3,6 +3,7 @@
 import TemperatureChart from "@/components/TemperatureChart";
 import { useParams } from "next/navigation";
 import React from "react";
+import UpdateDeviceBtn from "./UpdateDeviceBtn";
 
 const DevicePage: React.FC = () => {
   const [device, setDevice] = React.useState<Device | null>(null);
@@ -11,7 +12,7 @@ const DevicePage: React.FC = () => {
 
   React.useEffect(() => {
     const fetchDevice = async () => {
-      const response = await fetch(`/api/v1/devices/${id}`);
+      const response = await fetch(`/api/devices/${id}`);
       const data = await response.json();
       setDevice(data);
     };
@@ -20,12 +21,17 @@ const DevicePage: React.FC = () => {
 
   return (
     <div className="mb-10 flex flex-col">
-      <h4 className="mx-14 scroll-m-20 text-xl font-semibold tracking-tight">
-        Device {id} - {device?.name}
-      </h4>
+      <div className="flex justify-between mx-14">
+        <h4 className=" scroll-m-20 text-xl font-semibold tracking-tight">
+          Device {id} - {device?.name} - {device?.limit}
+        </h4>
+        <UpdateDeviceBtn id={id} />
+      </div>
 
       <div className="m-10 flex justify-center">
-        <TemperatureChart id={id} className="w-full" />
+        {device && (
+          <TemperatureChart id={id} limit={device?.limit} className="w-full" />
+        )}
       </div>
     </div>
   );

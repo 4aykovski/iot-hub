@@ -28,8 +28,6 @@ func New(urls string) Sender {
 		}
 	}
 
-	fmt.Println(len(u))
-	fmt.Println(u)
 	return &sender{
 		urls: u,
 	}

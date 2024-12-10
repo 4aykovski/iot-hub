@@ -7,6 +7,8 @@ import (
 
 type Config struct {
 	Http
+
+	URLs string `env:"DEVICES_NETWORKS" env-default:"localhost"`
 }
 
 type Http struct {
@@ -18,6 +20,11 @@ func Load() *Config {
 	var cfg Config
 
 	err := godotenv.Load("./configs/.env.connector")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = godotenv.Load("./configs/.env.device")
 	if err != nil {
 		panic(err.Error())
 	}

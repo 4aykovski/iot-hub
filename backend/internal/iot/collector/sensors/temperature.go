@@ -12,8 +12,8 @@ type Temperature struct {
 	apiUrl string
 }
 
-func NewTemperature(id string, apiUrl string) *Humidity {
-	return &Humidity{
+func NewTemperature(id string, apiUrl string) *Pressure {
+	return &Pressure{
 		BaseSensor: BaseSensor{
 			id:         id,
 			type_:      TemperatureType,

@@ -4,7 +4,7 @@ import "time"
 
 const (
 	TemperatureType = "temperature-sensor"
-	HumidityType    = "humidity-sensor"
+	PressureType    = "pressure-sensor"
 )
 
 type Sensor interface {

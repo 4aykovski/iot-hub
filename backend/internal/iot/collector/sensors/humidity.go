@@ -7,23 +7,23 @@ import (
 	"time"
 )
 
-type Humidity struct {
+type Pressure struct {
 	BaseSensor
 	apiUrl string
 }
 
-func NewHumidity(id string, apiUrl string) *Humidity {
-	return &Humidity{
+func NewPressure(id string, apiUrl string) *Pressure {
+	return &Pressure{
 		BaseSensor: BaseSensor{
 			id:         id,
-			type_:      HumidityType,
+			type_:      PressureType,
 			lastUpdate: time.Now(),
 		},
 		apiUrl: apiUrl,
 	}
 }
 
-func (hu *Humidity) Collect() (float64, string, error) {
+func (hu *Pressure) Collect() (float64, string, error) {
 	resp, err := http.Get(fmt.Sprintf("%s/data", hu.apiUrl))
 	if err != nil {
 		return -1, "", err
@@ -31,7 +31,7 @@ func (hu *Humidity) Collect() (float64, string, error) {
 	defer resp.Body.Close()
 
 	var data struct {
-		Humidity float64 `json:"pressure"`
+		Pressure float64 `json:"pressure"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
@@ -41,5 +41,5 @@ func (hu *Humidity) Collect() (float64, string, error) {
 
 	hu.lastUpdate = time.Now()
 
-	return data.Humidity, hu.type_, nil
+	return data.Pressure, hu.type_, nil
 }

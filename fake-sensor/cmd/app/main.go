@@ -23,12 +23,11 @@ func main() {
 type DataResponse struct {
 	Name        string  `json:"sensor_name"`
 	Temperature float64 `json:"temperature"`
-	Humidity    float64 `json:"humidity"`
+	Pressure    float64 `json:"pressure"`
 }
 
 func dataHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		fmt.Println("Received request")
 
 		var resp DataResponse
@@ -47,7 +46,7 @@ func dataHandler() http.HandlerFunc {
 
 		resp.Name = "temp-sensor"
 		resp.Temperature = float64(temp.Int64())
-		resp.Humidity = float64(humidity.Int64())
+		resp.Pressure = float64(humidity.Int64())
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

@@ -86,8 +86,8 @@ func (a *App) initCollector(ctx context.Context) error {
 		"temperature-sensor",
 		fmt.Sprintf("http://%s:19050", u),
 	)
-	humiditySensor := sensors.NewHumidity(
-		"humidity-sensor",
+	humiditySensor := sensors.NewPressure(
+		"pressure-sensor",
 		fmt.Sprintf("http://%s:19050", u),
 	)
 

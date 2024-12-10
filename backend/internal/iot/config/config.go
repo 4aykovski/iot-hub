@@ -17,7 +17,7 @@ type Config struct {
 
 type Collector struct {
 	Interval time.Duration `env:"COLLECTOR_INTERVAL" env-default:"5s"`
-	URLs     string        `env:"DEVICES_NETWORKS"   env-default:"host.docker.internal:19050"`
+	URLs     string        `env:"DEVICES_NETWORKS"   env-default:"host.docker.internal"`
 }
 
 type Http struct {

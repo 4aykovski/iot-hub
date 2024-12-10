@@ -86,7 +86,7 @@ func (a *App) initCollector(ctx context.Context) error {
 		"temperature-sensor",
 		fmt.Sprintf("http://%s:19050", u),
 	)
-	humiditySensor := sensors.NewPressure(
+	pressureSensor := sensors.NewPressure(
 		"pressure-sensor",
 		fmt.Sprintf("http://%s:19050", u),
 	)
@@ -106,15 +106,15 @@ func (a *App) initCollector(ctx context.Context) error {
 		}
 	}
 
-	_, err = a.provider.DeviceRepository(ctx).GetDevice(ctx, humiditySensor.ID())
+	_, err = a.provider.DeviceRepository(ctx).GetDevice(ctx, pressureSensor.ID())
 	if err != nil {
 		switch {
 		case errors.Is(err, repoerrs.ErrNoDevice):
 			a.provider.DeviceRepository(ctx).CreateDevice(ctx, model.Device{
-				ID:    humiditySensor.ID(),
-				Name:  "humidity",
+				ID:    pressureSensor.ID(),
+				Name:  "pressure",
 				Limit: -1,
-				Type:  humiditySensor.Type(),
+				Type:  pressureSensor.Type(),
 			})
 		default:
 			panic(err)
@@ -123,7 +123,7 @@ func (a *App) initCollector(ctx context.Context) error {
 
 	sensors := []sensors.Sensor{
 		tempSensor,
-		humiditySensor,
+		pressureSensor,
 	}
 
 	a.provider.SetCollector(collector.New(

@@ -31,7 +31,7 @@ func (hu *Humidity) Collect() (float64, string, error) {
 	defer resp.Body.Close()
 
 	var data struct {
-		Humidity float64 `json:"humidity"`
+		Humidity float64 `json:"pressure"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&data)

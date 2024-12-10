@@ -80,14 +80,15 @@ func (a *App) initProvider(ctx context.Context) error {
 
 func (a *App) initCollector(ctx context.Context) error {
 	u := strings.ReplaceAll(a.provider.Config().URLs, "'", "")
+	u = strings.ReplaceAll(u, " ", "")
 
 	tempSensor := sensors.NewTemperature(
 		"temperature-sensor",
-		fmt.Sprintf("http://%s", u),
+		fmt.Sprintf("http://%s:19050", u),
 	)
 	humiditySensor := sensors.NewHumidity(
 		"humidity-sensor",
-		fmt.Sprintf("http://%s", u),
+		fmt.Sprintf("http://%s:19050", u),
 	)
 
 	_, err := a.provider.DeviceRepository(ctx).GetDevice(ctx, tempSensor.ID())

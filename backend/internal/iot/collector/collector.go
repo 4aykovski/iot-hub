@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -64,6 +65,7 @@ func (c *Collector) collectData() {
 				log.Printf("Error collecting data from sensor %s: %v", s.ID(), err)
 				return
 			}
+			fmt.Println(value, type_)
 
 			err = c.dataRepository.SaveData(context.Background(), model.Data{
 				Timestamp: time.Now(),

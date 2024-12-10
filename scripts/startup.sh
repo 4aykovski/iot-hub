@@ -1,10 +1,10 @@
 #!/usr/bin/bash
 
-BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
-FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
+# BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
+# FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
 
-# BACKEND_SERVER_PATH=~/code/iot-hub/backend
-# FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
+BACKEND_SERVER_PATH=~/code/iot-hub/backend
+FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
 
 
 export PATH=$PATH:/usr/local/go/bin
@@ -22,7 +22,7 @@ go version
 
 echo "scanning network"
 
-hostname -i > nets.txt
+hostname -I > nets.txt
 NETS_FILE_PATH=$(pwd)/nets.txt
 
 cd $BACKEND_SERVER_PATH
@@ -38,7 +38,7 @@ sleep 15
 
 echo "scanning network"
 
-hostname -i > nets.txt
+hostname -I > nets.txt
 NETS_FILE_PATH=$(pwd)/nets.txt
 
 cd $BACKEND_SERVER_PATH

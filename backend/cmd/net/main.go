@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	sensor = "temp-sensor"
+	sensor = "TempSensor"
 )
 
 type Response struct {
-	Name string `json:"sensor_name"`
+	Name string `json:"deviceName"`
 }
 
 func scanNetwork(

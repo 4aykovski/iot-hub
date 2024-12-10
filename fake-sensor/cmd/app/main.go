@@ -60,6 +60,7 @@ func dataHandler() http.HandlerFunc {
 
 func connectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("got connect request")
 		w.WriteHeader(http.StatusOK)
 	}
 }

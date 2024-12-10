@@ -1,7 +1,18 @@
 import DeviceList from "@/components/DeviceList";
+import React from "react";
 
 export default function Home() {
-  const devices = [{ name: "Device 1", data: "Data 1", ID: "1" }];
+  const [devices, setDevices] = React.useState<Device[]>([]);
+  const [data, setData] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchDevices = async () => {
+      const response = await fetch("/api/v1/devices");
+      const data = await response.json();
+      setDevices(data);
+    };
+    fetchDevices();
+  });
 
   return (
     <div>

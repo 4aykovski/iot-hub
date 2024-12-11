@@ -1,0 +1,13 @@
+[Unit]
+Description=IoT Hub Application
+After=network.target
+
+[Service]
+Type=simple
+User=chaykovski
+WorkingDirectory=/home/chaykovski/apps/iot-hub
+ExecStart=/bin/bash /home/chaykovski/apps/iot-hub/scripts/startup.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

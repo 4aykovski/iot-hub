@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/4aykovski/iot-hub/backend/internal/connector/sender"
 	v1 "github.com/4aykovski/iot-hub/backend/internal/connector/transport/http/v1"
 	"golang.org/x/sync/errgroup"
 )
@@ -14,11 +15,12 @@ import (
 type App struct {
 	server *http.Server
 
+	sender sender.Sender
+
 	provider *Provider
 }
 
-func New(done chan struct{}) *App {
-
+func NewConnectorApp(done chan struct{}) *App {
 	a := &App{}
 
 	a.initDeps(done)
@@ -47,7 +49,12 @@ func (a *App) GracefullStop(ctx context.Context) error {
 
 func (a *App) initDeps(done chan struct{}) {
 	a.initProvider()
+	a.initSender()
 	a.initHttp(done)
+}
+
+func (a *App) initSender() {
+	a.sender = sender.New(a.provider.Config().URLs)
 }
 
 func (a *App) initHttp(done chan struct{}) {
@@ -57,7 +64,7 @@ func (a *App) initHttp(done chan struct{}) {
 			a.provider.Config().Http.Host,
 			a.provider.Config().Http.Port,
 		),
-		Handler:      v1.New(done),
+		Handler:      v1.New(done, a.sender),
 		IdleTimeout:  5 * time.Second,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,

@@ -8,13 +8,15 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+
+	"github.com/4aykovski/iot-hub/backend/internal/connector/sender"
 )
 
-func New(done chan struct{}) *http.ServeMux {
+func New(done chan struct{}, sender sender.Sender) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", ChooseConnect)
-	mux.HandleFunc("/connect", TryToConnect(done))
+	mux.HandleFunc("/connect", TryToConnect(done, sender))
 
 	return mux
 }
@@ -59,7 +61,7 @@ func ChooseConnect(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, res)
 }
 
-func TryToConnect(done chan struct{}) http.HandlerFunc {
+func TryToConnect(done chan struct{}, sender sender.Sender) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info("post connector request")
 
@@ -91,18 +93,25 @@ func TryToConnect(done chan struct{}) http.HandlerFunc {
 			}
 		}
 
+		err := sender.Connect(r.Context(), ssid, password)
+		if err != nil {
+			fmt.Println(err.Error())
+			fmt.Fprintf(w, "Error: %s", "failed to connect devices")
+			return
+		}
+
 		cmd := exec.CommandContext(
 			r.Context(),
 			app,
 			"-c",
-			"nmcli dev wifi connect "+ssid,
+			"sudo nmcli dev wifi connect "+ssid,
 		)
 
 		if len(password) > 0 {
 			cmd.Args[2] += " password " + password
 		}
 
-		_, err := cmd.Output()
+		_, err = cmd.Output()
 		if err != nil {
 			var exitErr *exec.ExitError
 			if errors.As(err, &exitErr) {
@@ -135,6 +144,7 @@ func TryToConnect(done chan struct{}) http.HandlerFunc {
 		fmt.Fprintf(w, res)
 
 		done <- struct{}{}
+		close(done)
 	}
 }
 

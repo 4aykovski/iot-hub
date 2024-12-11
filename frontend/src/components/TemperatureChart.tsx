@@ -1,6 +1,6 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, LabelList, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -16,14 +16,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
-
-const chartData = [
-  { time: "01:00", temperature: "10" },
-  { time: "02:00", temperature: "5" },
-  { time: "03:00", temperature: "6" },
-  { time: "04:00", temperature: "9" },
-  { time: "05:00", temperature: "11" },
-];
+import React from "react";
+import IntervalSelector from "./IntervalSelector";
+import { toast } from "sonner";
 
 const chartConfig = {
   temperature: {
@@ -34,18 +29,64 @@ const chartConfig = {
 
 interface TemperatureChartProps {
   id: string;
+  limit: number;
   className?: string;
 }
 
 const TemperatuteChart: React.FC<TemperatureChartProps> = ({
   id,
+  limit,
   className,
 }) => {
+  const [lastNotified, setLastNotified] = React.useState<number>(0);
+  const [chartData, setChartData] = React.useState<Data[]>([]);
+  const [timeInterval, setTimeInterval] = React.useState("60");
+
+  function handleIntervalSelect(interval) {
+    setTimeInterval(interval);
+  }
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(
+        `/api/devices/${id}/data?interval=${timeInterval}`,
+      );
+      const data = await response.json();
+      setChartData(data);
+    };
+    fetchData();
+    const intervalId = setInterval(fetchData, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [id, timeInterval]);
+
+  React.useEffect(() => {
+    if (limit === -1) {
+      return;
+    }
+
+    for (let i = 0; i < chartData.length; i++) {
+      if (chartData[i].value > limit && lastNotified < chartData[i].ID) {
+        toast(`Лимит превышен у устройства ${id}`, {
+          description: `${chartData[i].value} > ${limit}, ${chartData[i].timestamp}`,
+          action: {
+            label: "Undo",
+            onClick: () => console.log("Undo"),
+          },
+        });
+
+        setLastNotified(chartData[i].ID);
+      }
+    }
+  }, [chartData, limit, id]);
+
   return (
     <Card className={cn("max-w-[750px] min-w-[160px]", className)}>
       <CardHeader>
-        <CardTitle>Температура</CardTitle>
-        <CardDescription>Температура за последний час</CardDescription>
+        <CardTitle>
+          <IntervalSelector onChange={handleIntervalSelect} />
+        </CardTitle>
+        <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="max-h-[400px]">
@@ -59,24 +100,37 @@ const TemperatuteChart: React.FC<TemperatureChartProps> = ({
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="time"
+              dataKey="timestamp"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(1, 5)}
+              tickFormatter={(value) => value.slice(0, 8)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dot" />}
             />
             <Area
-              dataKey="temperature"
+              dataKey="value"
               type="natural"
               fill="var(--color-temperature)"
               fillOpacity={0.4}
+              dot={{
+                fill: "var(--color-temperature)",
+              }}
+              activeDot={{
+                r: 6,
+              }}
               stroke="var(--color-temperature)"
               stackId="a"
-            />
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={6}
+              />
+            </Area>
           </AreaChart>
         </ChartContainer>
       </CardContent>

@@ -2,6 +2,7 @@ import { ModeToggle } from "@/components/ModeToggle";
 import { ThemeProvider } from "./ThemeProvider";
 import "./globals.css";
 import { Navigation } from "./Navigation";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default function RootLayout({
             <ModeToggle />
           </header>
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

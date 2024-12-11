@@ -1,0 +1,9 @@
+FROM golang:1.23.3 
+
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
+
+WORKDIR /migrations
+
+COPY ./migrations/*.sql ./
+
+CMD goose postgres "host=$POSTGRES_HOST user=$POSTGRES_USER password=$POSTGRES_PASSWORD dbname=$POSTGRES_DB port=$POSTGRES_PORT sslmode=disable" up

@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"net/http"
 )
@@ -11,7 +12,9 @@ func main() {
 	http.HandleFunc("/data", dataHandler())
 	http.HandleFunc("/connect", connectHandler())
 
-	err := http.ListenAndServe(":19050", nil)
+	fmt.Println("Listening on port 19050")
+
+	err := http.ListenAndServe("0.0.0.0:19050", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -20,11 +23,12 @@ func main() {
 type DataResponse struct {
 	Name        string  `json:"sensor_name"`
 	Temperature float64 `json:"temperature"`
-	Humidity    float64 `json:"humidity"`
+	Pressure    float64 `json:"pressure"`
 }
 
 func dataHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Received request")
 
 		var resp DataResponse
 
@@ -42,7 +46,7 @@ func dataHandler() http.HandlerFunc {
 
 		resp.Name = "temp-sensor"
 		resp.Temperature = float64(temp.Int64())
-		resp.Humidity = float64(humidity.Int64())
+		resp.Pressure = float64(humidity.Int64())
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -56,6 +60,7 @@ func dataHandler() http.HandlerFunc {
 
 func connectHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("got connect request")
 		w.WriteHeader(http.StatusOK)
 	}
 }

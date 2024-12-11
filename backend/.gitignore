@@ -1,2 +1,1 @@
-.env.connector
-.env.iot
+postgres_data

@@ -1,20 +1,37 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
+	"os"
+	"strings"
 	"sync"
 	"time"
 )
 
-func scanNetwork(subnet string, port string, path string) {
+const (
+	sensor = "TempSensor"
+)
+
+type Response struct {
+	Name string `json:"deviceName"`
+}
+
+func scanNetwork(
+	results chan string,
+	subnet string,
+	port string,
+	path string,
+	outWg *sync.WaitGroup,
+) {
+	defer outWg.Done()
 	var wg sync.WaitGroup
-	results := make(chan string, 255)
 
 	// Параллельное сканирование
-	for i := 1; i <= 254; i++ {
+	for i := 0; i <= 254; i++ {
 		wg.Add(1)
 		go func(host int) {
 			defer wg.Done()
@@ -23,72 +40,125 @@ func scanNetwork(subnet string, port string, path string) {
 			url := fmt.Sprintf("http://%s:%s%s", ip, port, path)
 
 			client := http.Client{
-				Timeout: 2 * time.Second, // Короткий таймаут
+				Timeout: 3 * time.Second, // Короткий таймаут
 			}
 
-			fmt.Println(url)
 			resp, err := client.Get(url)
-			fmt.Println(resp)
 			if err == nil {
 				defer resp.Body.Close()
-				if resp.StatusCode == 200 {
+
+				res := Response{}
+				err := json.NewDecoder(resp.Body).Decode(&res)
+				if err != nil {
+					return
+				}
+
+				if resp.StatusCode == 200 && res.Name == sensor {
 					results <- ip
 				}
 			}
-			fmt.Println(err)
 		}(i)
 	}
 
 	// Закрытие канала после завершения всех горутин
-	go func() {
-		wg.Wait()
-		close(results)
-	}()
-
-	// Сбор результатов
-	for result := range results {
-		fmt.Printf("Found device at: %s\n", result)
-	}
-}
-
-type SomeBody struct {
-	SSID     string `json:"SSID"`
-	Password string `json:"Password"`
+	wg.Wait()
 }
 
 func main() {
-	// Примеры использования
-	// scanNetwork("192.168.182", "19050", "/connect") // Типичная домашняя сеть
-
-	// resp, err := http.Post("http://192.168.182.187:19050/connect", "application/json", nil)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	//
-	// fmt.Println(resp)
-
-	body := SomeBody{
-		SSID:     "iPhone",
-		Password: "Lionart724",
-	}
-
-	str, err := json.Marshal(&body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(string(str))
-	res, err := http.Post(
-		"http://192.168.182.187:19050/connect",
-		"application/json",
-		bytes.NewReader(str),
+	subnet := flag.String("subnet", "127.0.0.0", "Subnet to scan")
+	port := flag.String("port", "8080", "Port to scan")
+	path := flag.String("path", "/data", "Path to scan")
+	pathToSubnetFile := flag.String(
+		"subnetFile",
+		"",
+		"Path to subnet file",
 	)
-	if err != nil {
-		fmt.Println(err)
+	output := flag.String(
+		"output",
+		"/home/root/apps/iot-hub/backend/configs/.env.device",
+		"Output file",
+	)
+	flag.Parse()
+
+	if *pathToSubnetFile != "" {
+		file, err := os.Open(*pathToSubnetFile)
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			*subnet = scanner.Text()
+		}
+	}
+
+	nets := strings.Split(*subnet, " ")
+	subnets := make([]string, 0, len(nets))
+
+	for _, net := range nets {
+		index := strings.LastIndex(net, ".")
+
+		if index != -1 {
+			net = net[:index]
+		}
+
+		subnets = append(subnets, net)
+	}
+
+	fmt.Println("network scan started on", *port, *path)
+
+	foundNets := "DEVICES_NETWORKS='"
+	foundNetsMap := make(map[string]struct{})
+netloop:
+	for i := 0; i < 3; i++ {
+		results := make(chan string, 255)
+		wg := sync.WaitGroup{}
+
+		for _, subnet := range subnets {
+			wg.Add(1)
+			fmt.Println("Scanning subnet", subnet)
+			go scanNetwork(results, subnet, *port, *path, &wg)
+		}
+
+		go func() {
+			wg.Wait()
+			close(results)
+		}()
+
+		for result := range results {
+			if _, ok := foundNetsMap[result]; ok {
+				continue
+			}
+
+			fmt.Printf("Found device at: %s:19050\n", result)
+			foundNets += result + " "
+			foundNetsMap[result] = struct{}{}
+			break netloop
+		}
+
+		fmt.Printf("end %d try\n", i)
+		fmt.Println("Sleeping for 2 seconds...")
+		time.Sleep(2 * time.Second)
+	}
+
+	if foundNets == "DEVICES_NETWORKS='" {
+		fmt.Println("No devices found")
 		return
 	}
 
-	fmt.Println(res)
+	foundNets = foundNets + "'\n"
+
+	outputFile, err := os.Create(*output)
+	if err != nil {
+		panic(err)
+	}
+	defer outputFile.Close()
+
+	_, err = outputFile.WriteString(foundNets)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("network scan done")
 }

@@ -44,7 +44,7 @@ func dataHandler() http.HandlerFunc {
 			return
 		}
 
-		resp.Name = "temp-sensor"
+		resp.Name = "TempSensor"
 		resp.Temperature = float64(temp.Int64())
 		resp.Pressure = float64(humidity.Int64())
 

@@ -26,7 +26,7 @@ export const updateDevice = async (id: string, data: any) => {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Origin: origin,
+      "Access-Control-Allow-Origin": origin,
     },
     body: JSON.stringify(data),
   });

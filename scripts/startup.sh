@@ -1,13 +1,9 @@
 #!/usr/bin/bash
 
-# BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
-# FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
+BACKEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/backend"
+FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
 
-BACKEND_SERVER_PATH=~/code/iot-hub/backend
-FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
-
-
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:/usr/bin
 export CGO_ENABLED=0
 
 if [ ! $GOPATH ]; then
@@ -49,7 +45,7 @@ echo "starting backend"
 
 cd $BACKEND_SERVER_PATH
 sudo chmod -R 777 ./postgres_data
-docker-compose up --build -d
+docker-compose up  -d
 
 echo "starting frontend"
 

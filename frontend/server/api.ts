@@ -20,13 +20,11 @@ export const getDevice = async (id: string) => {
 
 export const updateDevice = async (id: string, data: any) => {
   console.log(data);
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   const response = await fetch(`http://localhost:8080/api/v1/devices/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": origin,
     },
     body: JSON.stringify(data),
   });

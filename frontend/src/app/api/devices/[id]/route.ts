@@ -48,3 +48,24 @@ export async function PUT(req: Request) {
     return NextResponse.error();
   }
 }
+
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const p = await params;
+    const id = p.id;
+    if (!id) {
+      return NextResponse.error();
+    }
+
+    const body = await req.json();
+    const res = await updateDevice(id, body);
+
+    return NextResponse.json(res);
+  } catch (error: any) {
+    console.error(error);
+    return NextResponse.error();
+  }
+}

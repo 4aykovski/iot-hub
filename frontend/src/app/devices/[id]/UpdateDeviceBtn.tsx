@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { Label } from "recharts";
-import { updateDevice } from "../../../../server/api";
 
 interface UpdateDeviceBtnProps {
   id: string;
@@ -22,9 +21,16 @@ const UpdateDeviceBtn: React.FC<UpdateDeviceBtnProps> = ({ id }) => {
   const [name, setName] = React.useState("");
   const [limit, setLimit] = React.useState("");
 
-  function handleUpdate() {
+  async function handleUpdate() {
     const limitNumber = Number(limit);
-    updateDevice(id, { name, limit: limitNumber });
+    await fetch(`/api/devices/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, limit: limitNumber }),
+    });
+
     setName("");
     setLimit("");
   }

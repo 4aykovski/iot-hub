@@ -5,6 +5,7 @@ name: iot
 services:
   backend:
     build: .
+    restart: always
     env_file:
       - ./configs/.env.iot
     ports:

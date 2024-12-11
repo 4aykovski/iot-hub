@@ -75,7 +75,7 @@ func TryToConnect(done chan struct{}, sender sender.Sender) http.HandlerFunc {
 				r.Context(),
 				app,
 				"-c",
-				"nmcli connection delete "+ssid,
+				"sudo nmcli connection delete "+ssid,
 			)
 
 			_, err := dropConnection.Output()

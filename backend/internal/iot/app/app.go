@@ -82,6 +82,8 @@ func (a *App) initCollector(ctx context.Context) error {
 	u := strings.ReplaceAll(a.provider.Config().URLs, "'", "")
 	u = strings.ReplaceAll(u, " ", "")
 
+	fmt.Println(u)
+
 	tempSensor := sensors.NewTemperature(
 		"temperature-sensor",
 		fmt.Sprintf("http://%s:19050", u),

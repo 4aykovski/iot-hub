@@ -53,7 +53,7 @@ func scanNetwork(
 					return
 				}
 
-				if resp.StatusCode == 200 && res.Name == sensor {
+				if resp.StatusCode == 200 && res.Name == sensor{
 					results <- ip
 				}
 			}

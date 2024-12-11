@@ -7,7 +7,7 @@ FRONTEND_SERVER_PATH="/home/chaykovski/apps/iot-hub/frontend"
 # FRONTEND_SERVER_PATH=~/code/iot-hub/frontend
 
 
-export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin:/usr/bin/
 export CGO_ENABLED=0
 
 if [ ! $GOPATH ]; then
@@ -20,9 +20,11 @@ fi
 
 go version
 
+sleep 30
+
 echo "scanning network"
 
-hostname -i > nets.txt
+hostname -I > nets.txt
 NETS_FILE_PATH=$(pwd)/nets.txt
 
 cd $BACKEND_SERVER_PATH
@@ -38,7 +40,7 @@ sleep 15
 
 echo "scanning network"
 
-hostname -i > nets.txt
+hostname -I > nets.txt
 NETS_FILE_PATH=$(pwd)/nets.txt
 
 cd $BACKEND_SERVER_PATH
@@ -49,7 +51,7 @@ echo "starting backend"
 
 cd $BACKEND_SERVER_PATH
 sudo chmod -R 777 ./postgres_data
-docker-compose up --build -d
+docker compose up -d
 
 echo "starting frontend"
 

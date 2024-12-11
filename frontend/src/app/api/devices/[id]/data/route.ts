@@ -20,7 +20,6 @@ export async function GET(
     if (!res) {
       return NextResponse.error();
     }
-    console.log(res);
 
     const data: Data[] = res.data.map((data: any) => {
       return {
@@ -29,8 +28,6 @@ export async function GET(
         timestamp: new Date(data.Timestamp).toTimeString(),
       };
     });
-
-    console.log(data);
 
     return NextResponse.json(data);
   } catch (error: any) {

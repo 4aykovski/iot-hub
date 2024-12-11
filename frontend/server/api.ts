@@ -28,6 +28,7 @@ export const updateDevice = async (id: string, data: any) => {
     },
     body: JSON.stringify(data),
   });
+  console.log(response);
 
   if (!response.ok) {
     throw new Error(response.statusText);
@@ -40,8 +41,6 @@ export const getData = async (id: string, interval: string) => {
   const response = await fetch(
     `http://localhost:8080/api/v1/devices/${id}/data?interval=${interval}`,
   );
-
-  console.log(response);
 
   if (!response.ok) {
     throw new Error(response.statusText);

@@ -8,13 +8,11 @@ export async function GET(
   try {
     const p = await params;
     const id = p.id;
-    console.log(id);
     if (!id) {
       return NextResponse.error();
     }
 
     const res = await getDevice(id);
-    console.log(res);
 
     const device: Device = {
       ID: res.device.id,
@@ -31,10 +29,13 @@ export async function GET(
   }
 }
 
-export async function PUT(req: Request) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const p = await params;
+    const id = p.id;
     if (!id) {
       return NextResponse.error();
     }
@@ -44,6 +45,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(res);
   } catch (error: any) {
+    console.log("123");
     console.error(error);
     return NextResponse.error();
   }

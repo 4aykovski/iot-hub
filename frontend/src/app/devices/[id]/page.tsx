@@ -4,9 +4,12 @@ import TemperatureChart from "@/components/TemperatureChart";
 import { useParams } from "next/navigation";
 import React from "react";
 import UpdateDeviceBtn from "./UpdateDeviceBtn";
+import DataList from "./DataList";
+import { Button } from "@/components/ui/button";
 
 const DevicePage: React.FC = () => {
   const [device, setDevice] = React.useState<Device | null>(null);
+  const [deviceData, setDeviceData] = React.useState<Data[]>([]);
   const params = useParams<{ id: string }>();
   const id = params.id;
 
@@ -19,8 +22,18 @@ const DevicePage: React.FC = () => {
     fetchDevice();
   }, [id]);
 
+  function handleBtnClick() {
+    const fetchDeviceData = async () => {
+      const response = await fetch(`/api/devices/${id}/data?interval=-1`);
+      const data = await response.json();
+      console.log(data);
+      setDeviceData(data);
+    };
+    fetchDeviceData();
+  }
+
   return (
-    <div className="mb-10 flex flex-col">
+    <div className="mb-10 flex flex-col justify-center">
       <div className="flex justify-between mx-14">
         <h4 className=" scroll-m-20 text-xl font-semibold tracking-tight">
           Device {id} - {device?.name} - {device?.limit}
@@ -32,6 +45,18 @@ const DevicePage: React.FC = () => {
         {device && (
           <TemperatureChart id={id} limit={device?.limit} className="w-full" />
         )}
+      </div>
+
+      <div className="flex justify-center items-center flex-col">
+        <div className="overflow-hidden w-[500px] h-[500px]">
+          <Button variant="outline" onClick={handleBtnClick}>
+            Показать данные
+          </Button>
+          <DataList
+            className="overflow-y-scroll h-[450px]"
+            chartData={deviceData}
+          />
+        </div>
       </div>
     </div>
   );

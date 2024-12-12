@@ -63,6 +63,10 @@ func (de *Device) UpdateDevice(ctx context.Context, device model.Device) error {
 		device.Limit = oldDevice.Limit
 	}
 
+	if device.Email == "" {
+		device.Email = oldDevice.Email
+	}
+
 	fmt.Println(device)
 
 	err = de.deviceRepo.UpdateDevice(ctx, device)

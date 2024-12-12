@@ -103,6 +103,7 @@ func (h *DeviceHandler) GetDevice() http.HandlerFunc {
 type UpdateDeviceRequest struct {
 	Name  string  `json:"name"`
 	Limit float64 `json:"limit"`
+	Email string  `json:"email"`
 }
 
 func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
@@ -126,6 +127,7 @@ func (h *DeviceHandler) UpdateDevice() http.HandlerFunc {
 			ID:    id,
 			Name:  req.Name,
 			Limit: req.Limit,
+			Email: req.Email,
 		}
 
 		if err := h.deviceService.UpdateDevice(r.Context(), device); err != nil {

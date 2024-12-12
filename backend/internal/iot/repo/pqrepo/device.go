@@ -52,7 +52,7 @@ func (d *Device) GetDevice(ctx context.Context, id string) (model.Device, error)
 
 	var device model.Device
 	err = conn.QueryRow(ctx, stmt, args...).
-		Scan(&device.ID, &device.Name, &device.Limit, &device.Type)
+		Scan(&device.ID, &device.Name, &device.Limit, &device.Type, &device.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return model.Device{}, repoerrs.ErrNoDevice
@@ -88,7 +88,7 @@ func (d *Device) GetDevices(ctx context.Context) ([]model.Device, error) {
 
 	for rows.Next() {
 		var device model.Device
-		err = rows.Scan(&device.ID, &device.Name, &device.Limit, &device.Type)
+		err = rows.Scan(&device.ID, &device.Name, &device.Limit, &device.Type, &device.Email)
 		if err != nil {
 			return []model.Device{}, fmt.Errorf("device.GetDevices: %w", err)
 		}
@@ -109,6 +109,7 @@ func (d *Device) UpdateDevice(ctx context.Context, device model.Device) error {
 		Set("name", device.Name).
 		Set("\"limit\"", device.Limit).
 		Set("type", device.Type).
+		Set("email", device.Email).
 		Where("id = ?", device.ID).
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()

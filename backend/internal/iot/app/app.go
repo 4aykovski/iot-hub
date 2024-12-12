@@ -138,6 +138,7 @@ func (a *App) initCollector(ctx context.Context) error {
 		a.provider.DataRepository(ctx),
 		a.provider.DeviceRepository(ctx),
 		a.provider.Config().Interval,
+		a.provider.DataService(ctx),
 	))
 
 	return nil

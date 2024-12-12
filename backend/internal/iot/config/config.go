@@ -13,6 +13,7 @@ type Config struct {
 
 	Postgres postgres.Config
 	Collector
+	Mail
 }
 
 type Collector struct {
@@ -23,6 +24,13 @@ type Collector struct {
 type Http struct {
 	Host string `env:"IOT_HTTP_HOST" env-default:"0.0.0.0"`
 	Port string `env:"IOT_HTTP_PORT" env-default:"18081"`
+}
+
+type Mail struct {
+	MailFrom     string `env:"MAIL_FROM"      env-required:"true"`
+	MailPassword string `env:"MAIL_PASSWORD"  env-required:"true"`
+	SmtpHost     string `env:"MAIL_SMTP_HOST" env-required:"true"`
+	SmtpPort     int    `env:"MAIL_SMTP_PORT" env-required:"true"`
 }
 
 func Load() *Config {

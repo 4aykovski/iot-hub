@@ -5,4 +5,5 @@ type Device struct {
 	Name  string  `json:"name"`
 	Type  string  `json:"type"`
 	Limit float64 `json:"limit"`
+	Email string  `json:"email"`
 }

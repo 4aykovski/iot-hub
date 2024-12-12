@@ -17,6 +17,7 @@ import (
 type DataService interface {
 	GetDeviceData(ctx context.Context, id string, interval int) ([]model.Data, error)
 	GetDataFromPeriod(ctx context.Context, dto service.GetDataForPeriodDTO) ([]model.Data, error)
+	SendEmail(ctx context.Context, id string, limit int, value string, timestamp string) error
 }
 
 type Data struct {
@@ -152,5 +153,41 @@ func (h *Data) GetDataForPeriod() http.HandlerFunc {
 			Data:     data,
 			Response: response.OK(),
 		})
+	}
+}
+
+type SendEmailRequest struct {
+	DeviceID  string `json:"device_id"`
+	Limit     int    `json:"limit"`
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
+func (h *Data) SendEmail() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req SendEmailRequest
+		if err := render.DecodeJSON(r.Body, &req); err != nil {
+			slog.Info(
+				"invalid request",
+				slog.String("error", err.Error()),
+			)
+
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, response.BadRequestError("invalid request"))
+			return
+		}
+
+		if err := h.dataService.SendEmail(r.Context(), req.DeviceID, req.Limit, req.Value, req.Timestamp); err != nil {
+			slog.Error(
+				"failed to send email",
+				slog.String("error", err.Error()),
+			)
+
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, response.InternalError())
+			return
+		}
+
+		render.JSON(w, r, response.OK())
 	}
 }

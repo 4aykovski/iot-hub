@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"net/smtp"
 	"time"
 
 	"github.com/4aykovski/iot-hub/backend/internal/iot/config"
@@ -33,6 +34,7 @@ type DataService interface {
 	GetDeviceData(ctx context.Context, id string, interval int) ([]model.Data, error)
 	GetDataFromPeriod(ctx context.Context, dto service.GetDataForPeriodDTO) ([]model.Data, error)
 	SaveData(ctx context.Context, data model.Data) error
+	SendEmail(ctx context.Context, id string, limit int, value string, timestamp string) error
 }
 
 type DeviceService interface {
@@ -49,6 +51,7 @@ type Provider struct {
 	config    *config.Config
 	db        *postgres.DB
 	collector Collector
+	smtpAuth  smtp.Auth
 
 	// repositories
 	dataRepository   DataRepository
@@ -73,6 +76,19 @@ func (p *Provider) Config() *config.Config {
 	}
 
 	return p.config
+}
+
+func (p *Provider) SmtpAuth(ctx context.Context) smtp.Auth {
+	if p.smtpAuth == nil {
+		p.smtpAuth = smtp.PlainAuth(
+			"",
+			p.Config().MailFrom,
+			p.Config().MailPassword,
+			p.Config().SmtpHost,
+		)
+	}
+
+	return p.smtpAuth
 }
 
 func (p *Provider) DB(ctx context.Context) *postgres.DB {
@@ -106,7 +122,12 @@ func (p *Provider) DeviceRepository(ctx context.Context) DeviceRepository {
 
 func (p *Provider) DataService(ctx context.Context) DataService {
 	if p.dataService == nil {
-		p.dataService = service.NewData(p.DataRepository(ctx))
+		p.dataService = service.NewData(
+			p.DataRepository(ctx),
+			p.SmtpAuth(ctx),
+			p.Config().Mail,
+			p.DeviceRepository(ctx),
+		)
 	}
 
 	return p.dataService

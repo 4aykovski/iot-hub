@@ -16,7 +16,12 @@ type DataRepository interface {
 }
 
 type DeviceRepository interface {
+	GetDevice(ctx context.Context, id string) (model.Device, error)
 	GetDevices(ctx context.Context) ([]model.Device, error)
+}
+
+type DataService interface {
+	SendEmail(ctx context.Context, id string, limit int, value string, timestamp string) error
 }
 
 type Collector struct {
@@ -24,6 +29,8 @@ type Collector struct {
 	dataRepository   DataRepository
 	deviceRepository DeviceRepository
 	interval         time.Duration
+
+	dataService DataService
 }
 
 func New(
@@ -31,12 +38,14 @@ func New(
 	dataRepository DataRepository,
 	deviceRepository DeviceRepository,
 	interval time.Duration,
+	dataService DataService,
 ) *Collector {
 	return &Collector{
 		sensors:          sensors,
 		dataRepository:   dataRepository,
 		deviceRepository: deviceRepository,
 		interval:         interval,
+		dataService:      dataService,
 	}
 }
 
@@ -67,6 +76,26 @@ func (c *Collector) collectData() {
 				return
 			}
 			fmt.Println(value, type_)
+
+			device, err := c.deviceRepository.GetDevice(context.Background(), type_)
+			if err != nil {
+				log.Printf("Error getting device for sensor %s: %v", s.ID(), err)
+				return
+			}
+
+			if device.Limit != -1 && value > device.Limit && device.Email != "" {
+				err = c.dataService.SendEmail(
+					context.Background(),
+					type_,
+					int(device.Limit),
+					fmt.Sprintf("%f", value),
+					time.Now().String(),
+				)
+				if err != nil {
+					log.Printf("Error sending email for sensor %s: %v", s.ID(), err)
+					return
+				}
+			}
 
 			err = c.dataRepository.SaveData(context.Background(), model.Data{
 				Timestamp: time.Now(),

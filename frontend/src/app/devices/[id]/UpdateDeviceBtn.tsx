@@ -20,6 +20,7 @@ interface UpdateDeviceBtnProps {
 const UpdateDeviceBtn: React.FC<UpdateDeviceBtnProps> = ({ id }) => {
   const [name, setName] = React.useState("");
   const [limit, setLimit] = React.useState("");
+  const [email, setEmail] = React.useState("");
 
   async function handleUpdate() {
     const limitNumber = Number(limit);
@@ -28,7 +29,7 @@ const UpdateDeviceBtn: React.FC<UpdateDeviceBtnProps> = ({ id }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, limit: limitNumber }),
+      body: JSON.stringify({ name, limit: limitNumber, email }),
     });
 
     setName("");
@@ -68,6 +69,18 @@ const UpdateDeviceBtn: React.FC<UpdateDeviceBtnProps> = ({ id }) => {
               placeholder="40"
               className="col-span-3"
               onChange={(e) => setLimit(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label name="email" className="text-right">
+              Лимит
+            </Label>
+            <Input
+              id="email"
+              defaultValue={email}
+              placeholder="example@gmail.com"
+              className="col-span-3"
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
         </div>

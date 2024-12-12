@@ -44,6 +44,9 @@ func scanNetwork(
 			}
 
 			resp, err := client.Get(url)
+			if ip == "192.168.43.219" {
+				fmt.Println(err)
+			}
 			if err == nil {
 				defer resp.Body.Close()
 
@@ -52,6 +55,8 @@ func scanNetwork(
 				if err != nil {
 					return
 				}
+	
+				fmt.Println(res)
 
 				if resp.StatusCode == 200 && res.Name == sensor{
 					results <- ip

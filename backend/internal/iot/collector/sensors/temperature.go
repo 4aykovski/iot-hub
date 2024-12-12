@@ -12,8 +12,8 @@ type Temperature struct {
 	apiUrl string
 }
 
-func NewTemperature(id string, apiUrl string) *Pressure {
-	return &Pressure{
+func NewTemperature(id string, apiUrl string) *Temperature {
+	return &Temperature{
 		BaseSensor: BaseSensor{
 			id:         id,
 			type_:      TemperatureType,
@@ -32,12 +32,15 @@ func (te *Temperature) Collect() (float64, string, error) {
 
 	var data struct {
 		Temperature float64 `json:"temperature"`
+		Pressure float64 `json:"pressure"`
+		Name string `json:"deviceName"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		return -1, "", err
 	}
+	fmt.Println(data)
 
 	te.lastUpdate = time.Now()
 

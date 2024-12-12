@@ -48,6 +48,7 @@ sleep 5
 
 cd $BACKEND_SERVER_PATH
 sudo chmod -R 777 ./postgres_data
+docker compose build backend
 docker compose up  -d
 
 echo "starting frontend"

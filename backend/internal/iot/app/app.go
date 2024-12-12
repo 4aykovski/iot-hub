@@ -93,6 +93,9 @@ func (a *App) initCollector(ctx context.Context) error {
 		fmt.Sprintf("http://%s:19050", u),
 	)
 
+	fmt.Println(tempSensor)
+	fmt.Println(pressureSensor)
+
 	_, err := a.provider.DeviceRepository(ctx).GetDevice(ctx, tempSensor.ID())
 	if err != nil {
 		switch {
@@ -127,6 +130,8 @@ func (a *App) initCollector(ctx context.Context) error {
 		tempSensor,
 		pressureSensor,
 	}
+
+	fmt.Println(sensors)
 
 	a.provider.SetCollector(collector.New(
 		sensors,

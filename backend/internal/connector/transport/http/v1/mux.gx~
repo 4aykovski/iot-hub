@@ -94,7 +94,7 @@ func TryToConnect(done chan struct{}, sender sender.Sender) http.HandlerFunc {
 		}
 
 		var err error
-		go sender.Connect(r.Context(), ssid, password)
+		_ = sender.Connect(r.Context(), ssid, password)
 
 
 		cmd := exec.CommandContext(

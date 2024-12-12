@@ -93,9 +93,12 @@ func TryToConnect(done chan struct{}, sender sender.Sender) http.HandlerFunc {
 			}
 		}
 
-		var err error
-		go sender.Connect(r.Context(), ssid, password)
-
+		err := sender.Connect(r.Context(), ssid, password)
+		if err != nil {
+			fmt.Println(err.Error())
+			fmt.Fprintf(w, "Error: %s", "failed to connect devices")
+			return
+		}
 
 		cmd := exec.CommandContext(
 			r.Context(),

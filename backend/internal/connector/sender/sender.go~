@@ -60,13 +60,19 @@ func (s *sender) tryToConnect(ctx context.Context, url string, ssid string, pass
 	if err != nil {
 		return fmt.Errorf("sender.tryToConnect: %w", err)
 	}
-	fmt.Println(string(data))
 
-	_, _ = http.Post(
+	resp, err := http.Post(
 		fmt.Sprintf("%s/connect", url),
 		"application/json",
 		bytes.NewReader(data),
 	)
+	if err != nil {
+		return fmt.Errorf("sender.tryToConnect: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("sender.tryToConnect: %w", err)
+	}
 
 	return nil
 }

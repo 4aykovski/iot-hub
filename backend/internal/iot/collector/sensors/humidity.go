@@ -32,12 +32,16 @@ func (hu *Pressure) Collect() (float64, string, error) {
 
 	var data struct {
 		Pressure float64 `json:"pressure"`
+		Temperature float64 `json:"temperature"`
+		Name string `json:"deviceName"`
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		return -1, "", err
 	}
+
+	fmt.Printf("%s %v", "pressure", data)
 
 	hu.lastUpdate = time.Now()
 

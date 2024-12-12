@@ -62,7 +62,7 @@ func (s *sender) tryToConnect(ctx context.Context, url string, ssid string, pass
 	}
 	fmt.Println(string(data))
 
-	_, _ = http.Post(
+	resp, _ := http.Post(
 		fmt.Sprintf("%s/connect", url),
 		"application/json",
 		bytes.NewReader(data),

@@ -59,6 +59,7 @@ func (c *Collector) collectData() {
 	for _, s := range c.sensors {
 		wg.Add(1)
 		go func(s sensors.Sensor) {
+			fmt.Printf("%s, %v", "sensor", s)
 			defer wg.Done()
 			value, type_, err := s.Collect()
 			if err != nil {

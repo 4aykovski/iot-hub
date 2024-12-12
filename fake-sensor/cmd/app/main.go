@@ -21,7 +21,7 @@ func main() {
 }
 
 type DataResponse struct {
-	Name        string  `json:"sensor_name"`
+	Name        string  `json:"deviceName"`
 	Temperature float64 `json:"temperature"`
 	Pressure    float64 `json:"pressure"`
 }
